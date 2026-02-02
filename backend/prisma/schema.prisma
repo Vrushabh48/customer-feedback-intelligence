@@ -16,7 +16,7 @@ datasource db {
 model User {
   id              String   @id @default(cuid())
   email           String   @unique
-  passwordHash    String?
+  passwordHash    String
   emailVerified   Boolean  @default(false)
   name            String?
   image           String?
@@ -27,6 +27,8 @@ model User {
 
   sessions        Session[]
   emailTokens     EmailToken[]
+  profile         Profile[]
+  forms           FeedbackForm[]
 }
 
 enum AuthProvider {
@@ -71,4 +73,110 @@ model EmailToken {
 enum EmailTokenType {
   VERIFY_EMAIL
   RESET_PASSWORD
+}
+
+model Profile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+
+  name   String?
+  logoURL     String?
+
+  // Business context
+  role          String?     // founder, pm, dev, support, etc.
+  companyName   String?
+  companySize   CompanySize?
+  industry      String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum CompanySize {
+  SOLO
+  SMALL_1_10
+  SMALL_11_50
+  MID_51_200
+  LARGE_200_PLUS
+}
+
+model FeedbackForm {
+  id          String   @id @default(cuid())
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+
+  title       String
+  description String?
+
+  slug        String
+  token       String   @unique
+  isActive    Boolean  @default(true)
+  allowAnon   Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  fields      FeedbackFormField[]
+  feedbacks   Feedback[]
+
+  @@index([ownerId])
+}
+
+model FeedbackFormField {
+  id        String   @id @default(cuid())
+  formId    String
+  form      FeedbackForm @relation(fields: [formId], references: [id])
+
+  type      FeedbackFieldType
+  label     String
+  required  Boolean @default(false)
+  order     Int
+
+  createdAt DateTime @default(now())
+  response FeedbackResponse[]
+  isActive Boolean @default(true)
+
+  @@index([formId])
+  @@unique([formId, order])
+}
+
+enum FeedbackFieldType {
+  TEXT
+  RATING
+  EMAIL
+  NAME
+}
+
+model FeedbackResponse {
+  id          String   @id @default(cuid())
+  feedbackId  String
+  feedback    Feedback @relation(fields: [feedbackId], references: [id])
+
+  fieldId     String
+  field       FeedbackFormField @relation(fields: [fieldId], references: [id])
+
+  value       String
+
+  createdAt   DateTime @default(now())
+
+  @@index([feedbackId])
+  @@index([fieldId])
+}
+
+
+model Feedback {
+  id            String   @id @default(cuid())
+  formId        String
+  form          FeedbackForm @relation(fields: [formId], references: [id])
+
+  userAgent     String?
+  ipAddress     String?
+
+  createdAt     DateTime @default(now())
+
+  responses     FeedbackResponse[]
+
+  @@index([formId])
+  @@index([createdAt])
 }

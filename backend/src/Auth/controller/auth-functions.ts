@@ -13,6 +13,11 @@ export async function signup(email: string, password: string) {
     const user = await prisma.user.create({
       data: { email, passwordHash }
     });
+
+    //creating user profile during signup
+    const profile = await prisma.profile.create({
+      data: { userId: user.id }
+    });
   
     //sending email for email verification
     await sendEmailVerification(user.id, user.email);

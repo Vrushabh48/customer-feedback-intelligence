@@ -4,6 +4,8 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./Auth/routes/auth.routes.js";
+import feedbackRoutes from "./models/feedback/routes.js";
+import profileRoutes from "./models/user/routes.js";
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.get("/", (_req: Request, res: Response) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/feedback", feedbackRoutes);
+app.use("/profile", profileRoutes);
 
 app.listen(3000, () => {
     console.log("App is running on port 3000");

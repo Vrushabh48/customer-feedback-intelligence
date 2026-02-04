@@ -6,6 +6,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import Dashboard from "./pages/Dashboard";
+import CreateForm from "./pages/Create-form";
+import FeedbackResponse from "./pages/feedback-response";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/create" element={<CreateForm />} />
+          <Route path="/response" element={<FeedbackResponse />}/>
         </Route>
 
         {/* Protected routes */}
